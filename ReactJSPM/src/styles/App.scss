@@ -1,0 +1,191 @@
+/* Base Application Styles */
+html, body {
+  background: #fff;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 auto;
+}
+
+body, ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+.header {
+  width: 100%;
+  height: 4rem;
+  line-height: 4rem;
+  background-color: #000;
+
+  @at-root {
+    .image-logo {
+      width: 7rem;
+      height: 4rem;
+      margin: 0 0.5rem;
+      background: #000 url('../images/logo.png') no-repeat center;
+      background-size: 100%;
+      float: left;
+    }
+
+    .title {
+      color: #fff;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .group {
+      visibility: hidden;
+      height: 2rem;
+      line-height: 2rem;
+      float: right;
+      color: #f00;
+      background-color: #fff;
+      margin: 1rem 0.5rem;
+    }
+  }
+}
+
+.menus {
+  position: fixed;
+  width: 7.5rem;
+  height: 100%;
+  background-color: #c63c3c;
+  overflow: hidden;
+
+  @at-root {
+    .menu-wrap {
+      width: 8.5rem;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+
+    .menu-wrap li {
+      display: block;
+      width: 7.5rem;
+      list-style: none;
+      font-size: 1rem;
+      text-align: center;
+      border-bottom: 1px solid #fff;
+    }
+
+    .menu-wrap li>a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 1.2rem 0;
+      color: #fff;
+    }
+
+    .selected {
+      background-color: rgb(153, 0, 0);
+    }
+  }
+}
+
+.content-section {
+  position: absolute;
+  margin-left: 7.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  top: 4rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem;
+
+  @at-root {
+    .content-box {
+      width: 100%;
+      height: auto; // auto
+      border: 1px solid #c1c1c1;
+      border-radius: 0.3rem;
+      background-color: #f6f6f6;
+      overflow-y: auto;
+    }
+
+    .content-section>select {
+      font-size: 0.625rem;
+    }
+  }
+}
+
+.app-box {
+  width: 20rem;
+  height: 20rem;
+  float: left;
+  position: relative;
+  box-sizing: border-box;
+  margin: 1rem;
+  padding-left: 1rem;
+  background-color: #fff;
+
+  @at-root {
+    .app-icon-right {
+      position: absolute;
+      top: .4rem;
+      right: .3rem;
+      z-index: 2;
+    }
+
+    .app-icon-bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .android {
+      border-left: 3rem solid transparent;
+      border-top: 3rem solid #a4c639;
+    }
+
+    .ios {
+      border-left: 3rem solid transparent;
+      border-top: 3rem solid #c6c7c9;
+    }
+
+    .app-info-box {
+      margin: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-icon {
+      width: 6.25rem;
+      height: 6.25rem;
+      margin-right: 1rem;
+    }
+
+    .info-name {
+      color: crimson;
+      font-size: 1.5rem;
+      line-height: 3rem;
+    }
+
+    .info-table-row {
+      display: table-row;
+      line-height: 1.5rem;
+    }
+
+    .info-table-cell {
+      display: table-cell;
+      width: 25%;
+      font-size: .9rem;
+    }
+
+    .info-round-btn {
+      color: black;
+      font-size: 1rem;
+      line-height: 4rem;
+      padding: .5rem;
+      border: 1px solid gray;
+      border-radius: .5rem;
+      cursor: hand;
+    }
+  }
+}
