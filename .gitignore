@@ -1,0 +1,6 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+PkgManager/.idea/
+PkgManager/package-service/target/
+PkgManager/*.iml
+PkgManager/package-service/*.iml
+
