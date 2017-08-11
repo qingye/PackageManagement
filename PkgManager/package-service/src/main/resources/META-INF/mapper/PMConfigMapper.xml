@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chris.pkg.manager.dao.mapper.PMConfigDaoMapper">
+
+    <resultMap id="PMConfigEntityMap" type="ConfigEntity">
+        <result property="keyId" column="key_id" />
+        <result property="state" column="state" />
+        <result property="appIdentifier" column="app_identifier" />
+        <result property="type" column="type" />
+        <result property="version" column="version" />
+        <result property="fileName" column="file_name" />
+        <result property="appName" column="app_name" />
+        <result property="bundleId" column="bundle_id" />
+        <result property="iconUrl" column="icon_url" />
+        <result property="createTimeStamp" column="create_time_stamp" />
+        <result property="physicalPath" column="physical_path" />
+        <result property="fileUrl" column="file_url" />
+    </resultMap>
+
+    <insert id="insertConfig" parameterType="ConfigEntity">
+        INSERT INTO config (
+            key_id,
+            state,
+            app_identifier,
+            type,
+            version,
+            file_name,
+            app_name,
+            bundle_id,
+            icon_url,
+            create_time_stamp,
+            physical_path,
+            file_url
+        )
+        VALUES (
+            #{keyId},
+            #{state},
+            #{appIdentifier},
+            #{type},
+            #{version},
+            #{fileName},
+            #{appName},
+            #{bundleId},
+            #{iconUrl},
+            now(),
+            #{physicalPath},
+            #{fileUrl}
+        )
+    </insert>
+
+    <select id="queryMenu" resultMap="PMConfigEntityMap">
+        SELECT
+          app_identifier,
+          app_name
+        FROM config
+        GROUP BY
+          app_identifier
+    </select>
+
+    <select id="queryNewestVersionByIdentifier" parameterType="ConfigEntity" resultMap="PMConfigEntityMap">
+        SELECT
+          key_id,
+          state,
+          app_identifier,
+          type,
+          max(version) as version,
+          file_name,
+          app_name,
+          bundle_id,
+          icon_url,
+          max(create_time_stamp) as create_time_stamp,
+          physical_path,
+          file_url
+        FROM config
+        <where>
+            state = 1
+            AND app_identifier = #{appIdentifier}
+        </where>
+        GROUP BY
+          bundle_id
+        ORDER BY
+          type ASC,
+          app_name ASC,
+          create_time_stamp DESC
+    </select>
+
+    <select id="queryVersions" parameterType="ConfigEntity" resultMap="PMConfigEntityMap">
+        SELECT
+          version
+        FROM config
+        <where>
+            state = 1
+            AND app_identifier = #{appIdentifier}
+            AND bundle_id = #{bundleId}
+        </where>
+        ORDER BY
+          version DESC
+    </select>
+
+    <select id="queryApps" parameterType="ConfigEntity" resultMap="PMConfigEntityMap">
+        SELECT * FROM config
+        <where>
+            state = 1
+            AND app_identifier = #{appIdentifier}
+            AND bundle_id = #{bundleId}
+            <if test="version != null">
+                AND version = #{version}
+            </if>
+        </where>
+        ORDER BY
+          version DESC,
+          create_time_stamp DESC
+    </select>
+
+    <select id="queryConfig" parameterType="ConfigEntity" resultMap="PMConfigEntityMap">
+        SELECT * FROM config
+        <where>
+            state = 1
+            <if test="appIdentifier != null">
+                AND app_identifier = #{appIdentifier}
+            </if>
+            <if test="bundleId != null">
+                AND bundle_id = #{bundleId}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="version != null">
+                AND version = #{version}
+            </if>
+        </where>
+        ORDER BY
+          create_time_stamp DESC
+    </select>
+</mapper>
