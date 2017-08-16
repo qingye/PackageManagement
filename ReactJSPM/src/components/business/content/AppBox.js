@@ -9,46 +9,50 @@ class AppBox extends Component {
 
   render() {
 
-    let pt = true; // true - android; false - ios
-    let iconClassName = 'iconfont app-icon-right' + (pt ? ' icon-android' : ' icon-ios');
-    let iconBgClassName = 'app-icon-bg' + (pt ? ' android' : ' ios');
+    let platform = this.props.app.type.toLowerCase();
+    let iconClassName = 'iconfont app-icon-right icon-' + platform;
+    let iconBgClassName = 'app-icon-bg ' + platform;
+
+    let qrcode = this.props.app.fileUrl ? this.props.app.fileUrl : '';
+    let historyBtnStyle = 'info-round-btn' + (this.props.hide ? ' hide' : '');
+    let history = '/history/' + this.props.app.bundleId;
 
     return (
-      <div className="app-box">
+      <div className="app-box" style={{marginLeft: this.props.marginLeft}}>
         <i className={iconClassName} />
         <div className={iconBgClassName}></div>
         <div className="app-info-box">
 
           {/* App Icon */}
-          <img className="info-icon" src="../../../images/123.png"/>
+          <img className="info-icon" src={this.props.app.iconUrl}/>
 
           {/* Download URL */}
-          <QRCode value='https://www.baidu.com' size={100}/>
+          <QRCode value={qrcode} size={100} level='L'/>
 
           {/* App Name */}
-          <div className="info-name">萌店</div>
+          <div className="info-name">{this.props.app.appName}</div>
 
           {/* Bundle or Package */}
           <div className="info-table-row">
             <div className="info-table-cell">Id</div>
-            <div className="info-table-cell">com.hs.yjsellerhoc</div>
+            <div className="info-table-cell">{this.props.app.bundleId}</div>
           </div>
 
           {/* Version */}
           <div className="info-table-row">
             <div className="info-table-cell">最新版本</div>
-            <div className="info-table-cell">4.8.0</div>
+            <div className="info-table-cell">{this.props.app.version}</div>
           </div>
 
           {/* TimeStamp */}
           <div className="info-table-row">
             <div className="info-table-cell">更新时间</div>
-            <div className="info-table-cell">2017/7/4 下午5:52:29</div>
+            <div className="info-table-cell">{new Date(this.props.app.createTimeStamp).toLocaleString()}</div>
           </div>
 
           <div>
-            <a className="info-round-btn" href="#">下载当前版本</a>
-            <Link className="info-round-btn" style={{marginLeft: '1rem'}} to="/history/all">查看历史版本</Link>
+            <a className="info-round-btn" href={this.props.app.fileUrl}>下载当前版本</a>
+            <Link className={historyBtnStyle} style={{marginLeft: '1rem'}} to={history}>查看历史版本</Link>
           </div>
         </div>
       </div>

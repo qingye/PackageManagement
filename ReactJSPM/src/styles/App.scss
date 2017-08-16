@@ -16,11 +16,37 @@ a {
   text-decoration: none;
 }
 
+.hide {
+  display: none;
+}
+
+.edge-zero {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.absolute-middle-css {
+  position: absolute;
+  margin: auto;
+  @extend .edge-zero;
+}
+
+@mixin platform($color: #fff) {
+  border-left: 3rem solid transparent;
+  border-top: 3rem solid $color;
+}
+
+@mixin font-with-same-lineHeight($height: 0) {
+  height: $height;
+  line-height: $height;
+}
+
 .header {
   width: 100%;
-  height: 4rem;
-  line-height: 4rem;
   background-color: #000;
+  @include font-with-same-lineHeight(4rem);
 
   @at-root {
     .image-logo {
@@ -30,6 +56,7 @@ a {
       background: #000 url('../images/logo.png') no-repeat center;
       background-size: 100%;
       float: left;
+      cursor: pointer;
     }
 
     .title {
@@ -40,17 +67,16 @@ a {
 
     .group {
       visibility: hidden;
-      height: 2rem;
-      line-height: 2rem;
       float: right;
       color: #f00;
       background-color: #fff;
       margin: 1rem 0.5rem;
+      @include font-with-same-lineHeight(2rem);
     }
   }
 }
 
-.menus {
+.menu-list {
   position: fixed;
   width: 7.5rem;
   height: 100%;
@@ -83,33 +109,31 @@ a {
     }
 
     .selected {
-      background-color: rgb(153, 0, 0);
+      background-color: #900;
     }
   }
 }
 
-.content-section {
-  position: absolute;
+.content {
+  @extend .absolute-middle-css;
   margin-left: 7.5rem;
   overflow-x: hidden;
   overflow-y: auto;
   top: 4rem;
-  left: 0;
-  right: 0;
-  bottom: 0;
   padding: 1rem;
 
   @at-root {
     .content-box {
       width: 100%;
-      height: auto; // auto
       border: 1px solid #c1c1c1;
       border-radius: 0.3rem;
+      padding: .625rem;
       background-color: #f6f6f6;
+      box-sizing: border-box;
       overflow-y: auto;
     }
 
-    .content-section>select {
+    .content>select {
       font-size: 0.625rem;
     }
   }
@@ -140,13 +164,11 @@ a {
     }
 
     .android {
-      border-left: 3rem solid transparent;
-      border-top: 3rem solid #a4c639;
+      @include platform(#a4c639)
     }
 
     .ios {
-      border-left: 3rem solid transparent;
-      border-top: 3rem solid #c6c7c9;
+      @include platform(#c6c7c9)
     }
 
     .app-info-box {
@@ -186,6 +208,43 @@ a {
       border: 1px solid gray;
       border-radius: .5rem;
       cursor: hand;
+    }
+  }
+}
+
+.uploadBox {
+  @extend .absolute-middle-css;
+
+  @at-root {
+    .uploadDiv {
+      @extend .absolute-middle-css;
+      width: 90%;
+      height: 90%;
+      border: .25rem dashed #0b97c4;
+      border-radius: .5rem;
+    }
+
+    .opacity {
+      opacity: .5;
+    }
+
+    .uploadDiv>.box {
+      text-align: center;
+      font-size: 1.5rem;
+      @extend .absolute-middle-css;
+      @include font-with-same-lineHeight(1.5rem);
+    }
+
+    .uploadSuccess {
+      display: none;
+      width: 30rem;
+      border: 1px solid #000;
+      border-radius: .2rem;
+      background-color: #fff;
+      text-align: center;
+      font-size: 1.5rem;
+      @extend .absolute-middle-css;
+      @include font-with-same-lineHeight(10rem);
     }
   }
 }

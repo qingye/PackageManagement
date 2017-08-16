@@ -4,7 +4,7 @@
 import App from '../components/App';
 import Login from '../components/business/login/Login';
 import Dashboard from '../components/business/Dashboard';
-import ContentSection from '../components/business/content/ContentSection';
+import Content from '../components/business/content/Content';
 import History from '../components/business/content/History';
 
 export const routers = {
@@ -24,11 +24,11 @@ export const routers = {
       component: Dashboard,
       childRoutes: [
         {
-          path: 'content/:bundle',
-          component: ContentSection
+          path: 'content(/:appIdentifier)',
+          component: Content
         },
         {
-          path: '/history/:bundle',
+          path: '/history(/:bundleId)',
           component: History
         }
       ]
