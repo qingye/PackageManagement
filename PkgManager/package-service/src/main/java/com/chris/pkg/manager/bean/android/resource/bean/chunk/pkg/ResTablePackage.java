@@ -9,7 +9,7 @@ import java.util.List;
 public class ResTablePackage implements Serializable {
     private ResChunkHeader header = null;
     private int id = 0;
-    private char[] name = null;
+    private char[] name = new char[128];
     private int typeStrings = 0;
     private int lastPublicType = 0;
     private int keyStrings = 0;

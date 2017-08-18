@@ -15,6 +15,7 @@
         <result property="createTimeStamp" column="create_time_stamp" />
         <result property="physicalPath" column="physical_path" />
         <result property="fileUrl" column="file_url" />
+        <result property="htmlUrl" column="html_url" />
     </resultMap>
 
     <insert id="insertConfig" parameterType="ConfigEntity">
@@ -30,7 +31,8 @@
             icon_url,
             create_time_stamp,
             physical_path,
-            file_url
+            file_url,
+            html_url
         )
         VALUES (
             #{keyId},
@@ -44,7 +46,8 @@
             #{iconUrl},
             now(),
             #{physicalPath},
-            #{fileUrl}
+            #{fileUrl},
+            #{htmlUrl}
         )
     </insert>
 
@@ -70,7 +73,8 @@
           icon_url,
           max(create_time_stamp) as create_time_stamp,
           physical_path,
-          file_url
+          file_url,
+          html_url
         FROM config
         <where>
             state = 1

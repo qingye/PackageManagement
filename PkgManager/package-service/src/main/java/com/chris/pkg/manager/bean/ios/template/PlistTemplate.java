@@ -1,7 +1,22 @@
 package com.chris.pkg.manager.bean.ios.template;
 
 public class PlistTemplate {
-    public String getTemplate(String ipa, String bundleId, String appName) {
+
+    private String httpPath = null;
+    private String ipa = null;
+    private String icon = null;
+    private String bundleId = null;
+    private String appName = null;
+
+    public PlistTemplate(String httpPath, String ipa, String icon, String bundleId, String appName) {
+        this.httpPath = httpPath;
+        this.ipa = ipa;
+        this.icon = icon;
+        this.bundleId = bundleId;
+        this.appName = appName;
+    }
+
+    public String getPlist() {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
                 .append("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n")
@@ -16,7 +31,7 @@ public class PlistTemplate {
                 .append("\t\t\t\t\t<key>kind</key>\n")
                 .append("\t\t\t\t\t<string>software-package</string>\n")
                 .append("\t\t\t\t\t<key>url</key>\n")
-                .append("\t\t\t\t\t<string>").append(ipa).append("</string>\n")
+                .append("\t\t\t\t\t<string>").append(String.format("%s/%s", httpPath, ipa)).append("</string>\n")
                 .append("\t\t\t\t</dict>\n")
                 .append("\t\t\t\t<dict>\n")
                 .append("\t\t\t\t\t<key>kind</key>\n")
@@ -24,7 +39,7 @@ public class PlistTemplate {
                 .append("\t\t\t\t\t<key>needs-shine</key>\n")
                 .append("\t\t\t\t\t<false/>\n")
                 .append("\t\t\t\t\t<key>url</key>\n")
-                .append("\t\t\t\t\t<string></string>\n")
+                .append("\t\t\t\t\t<string>").append(String.format("%s/%s", httpPath, icon)).append("</string>\n")
                 .append("\t\t\t\t</dict>\n")
                 .append("\t\t\t</array>\n")
                 .append("\t\t\t<key>metadata</key>\n")

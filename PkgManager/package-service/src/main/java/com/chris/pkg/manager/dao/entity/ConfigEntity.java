@@ -16,6 +16,7 @@ public class ConfigEntity implements Serializable {
     private Timestamp createTimeStamp;
     private String physicalPath;
     private String fileUrl;
+    private String htmlUrl;
 
     public String getKeyId() {
         return this.keyId;
@@ -111,5 +112,13 @@ public class ConfigEntity implements Serializable {
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+
+    public String getHtmlUrl() {
+        return htmlUrl;
+    }
+
+    public void setHtmlUrl(String htmlUrl) {
+        this.htmlUrl = htmlUrl;
     }
 }

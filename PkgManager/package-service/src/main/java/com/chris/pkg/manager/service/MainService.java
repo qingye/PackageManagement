@@ -1,11 +1,14 @@
 package com.chris.pkg.manager.service;
 
+import com.alibaba.fastjson.JSON;
 import com.chris.pkg.manager.bean.FileConfig;
+import com.chris.pkg.manager.bean.ios.Base64;
 import com.chris.pkg.manager.bean.ios.repng.NormalizedPNG;
 import com.chris.pkg.manager.bean.ios.template.PlistTemplate;
 import com.chris.pkg.manager.bean.model.UploadFile;
 import com.chris.pkg.manager.dao.entity.ConfigEntity;
 import com.chris.pkg.manager.dao.mapper.PMConfigDaoMapper;
+import com.chris.pkg.manager.system.PropertyPlaceHolder;
 import com.chris.pkg.manager.utils.FileUtil;
 
 import java.io.File;
@@ -49,17 +52,22 @@ public class MainService {
 
                 String bundleId = info.get("bundleId");
                 entity.setBundleId(bundleId);
-                String identifier = bundleId.replace("hoc", "").replace("dev", "").replace("pl", "");
+                String identifier = bundleId.replace("hoc", "").replace("dev", "").replace("pl", "").replace("qa", "");
                 if (identifier.endsWith(".")) {
                     identifier = identifier.substring(0, identifier.length() - 1);
                 }
                 entity.setAppIdentifier(identifier);
+
+                if (entity.getType().equals("iOS")) {
+                    configHtml(entity);
+                }
 
                 String destDir = String.format("%s/apps/%s/%s/%s", FileUtil.getRootLastPath(), entity.getAppIdentifier(), entity.getVersion(), entity.getType());
                 moveFiles(FileUtil.getTempDirPath(), destDir, entity);
             } else {
                 throw new RuntimeException("这是个假文件!");
             }
+            log.info("file entity = {}", JSON.toJSONString(entity));
             this.daoMapper.insertConfig(entity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,6 +84,8 @@ public class MainService {
 
         String relativePath = String.format("apps/%s/%s/%s", entity.getAppIdentifier(), entity.getVersion(), entity.getType());
         String httpPath = String.format("%s%s", httpPrefix, relativePath);
+        String ipa = null;
+        String icon = null;
 
         File sd = new File(srcDir);
         File[] fileList = sd.listFiles();
@@ -83,27 +93,41 @@ public class MainService {
             for (File file : fileList) {
                 String filepath = destDir + "/" + file.getName();
                 if ((file.getName().endsWith(".ipa")) || (file.getName().endsWith(".apk"))) {
+                    ipa = file.getName();
                     entity.setPhysicalPath(String.format("%s/%s", relativePath, file.getName()));
-                    if (file.getName().endsWith(".ipa")) {
-                        String plistName = String.format("%d.plist", System.currentTimeMillis());
-                        FileUtil.write(String.format("%s/%s", destDir, plistName), new PlistTemplate()
-                                .getTemplate(httpPath, entity.getBundleId(), entity.getAppName()));
-                        entity.setFileUrl(String.format("%s/%s", httpPath, plistName));
-                    } else {
-                        entity.setFileUrl(String.format("%s/%s", httpPath, file.getName()));
-                    }
+                    entity.setFileUrl(String.format("%s/%s", httpPath, file.getName()));
                 } else {
                     if (entity.getType().equals("iOS")) {
                         file = new NormalizedPNG(file).getPNGFile();
                         filepath = destDir + "/" + file.getName();
                     }
+                    icon = file.getName();
                     entity.setIconUrl(String.format("%s/%s", httpPath, file.getName()));
                 }
                 FileUtil.write(filepath, file);
                 file.delete();
             }
         }
+
+        if (entity.getType().equals("iOS")) {
+            String plistName = String.format("%d.plist", System.currentTimeMillis());
+            FileUtil.write(
+                    String.format("%s/%s", destDir, plistName),
+                    new PlistTemplate(httpPath, ipa, icon, entity.getBundleId(), entity.getAppName()).getPlist()
+            );
+            entity.setFileUrl(String.format("itms-services://?action=download-manifest&url=%s/%s", httpPath, plistName));
+        }
         sd.delete();
+    }
+
+    private void configHtml(ConfigEntity entity) {
+        ConfigEntity ce = new ConfigEntity();
+        ce.setAppIdentifier(entity.getAppIdentifier());
+        ce.setBundleId(entity.getBundleId());
+        ce.setVersion(entity.getVersion());
+        entity.setHtmlUrl(String.format("%s/%s",
+                PropertyPlaceHolder.getProperty("singlePageForIOS"),
+                Base64.encodeBytes(JSON.toJSONString(ce).getBytes())));
     }
 
     public List<ConfigEntity> getMenus() {
