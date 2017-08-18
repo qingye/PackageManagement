@@ -3,7 +3,7 @@
  */
 import config from 'config';
 
-//const BaseDevUrl = 'http://localhost:12001/';
+const BaseDevUrl = 'http://localhost:12001/';
 const BaseDistUrl = 'https://appmgr.vd.cn/';
 
 export default BaseUrl => {

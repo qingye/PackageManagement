@@ -18,9 +18,15 @@ class Header extends Component {
   }
 
   render() {
+
+    let logoClassName = 'image-logo';
+    if (this.props.logoVisible !== undefined && this.props.logoVisible == false) {
+      logoClassName += ' invisible';
+    }
+
     return (
       <div className="header">
-        <div className="image-logo" onClick={this.handleClick}></div>
+        <div className={logoClassName} onClick={this.handleClick}></div>
         <div className="group">
           User / Login
         </div>

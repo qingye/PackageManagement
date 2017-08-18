@@ -7,13 +7,35 @@ import {Link} from 'react-router';
 
 class AppBox extends Component {
 
+  numberFormat(number) {
+    let fmt;
+    if (number < 10) {
+      fmt = '0' + number;
+    } else {
+      fmt = '' + number;
+    }
+    return fmt;
+  }
+
+  dateFormat(date) {
+    return date.getFullYear() + '/' +
+      this.numberFormat((date.getMonth() + 1)) + '/' +
+      this.numberFormat(date.getDate()) + ' ' +
+      this.numberFormat(date.getHours()) + ':' +
+      this.numberFormat(date.getMinutes()) + ':' +
+      this.numberFormat(date.getSeconds());
+  }
+
   render() {
 
     let platform = this.props.app.type.toLowerCase();
     let iconClassName = 'iconfont app-icon-right icon-' + platform;
     let iconBgClassName = 'app-icon-bg ' + platform;
 
-    let qrcode = this.props.app.fileUrl ? this.props.app.fileUrl : '';
+    /**
+     * Only iOS has 'htmlUrl' because of iOS-device download must in Safari.
+     */
+    let qrcode = this.props.app.htmlUrl === undefined ? this.props.app.fileUrl : this.props.app.htmlUrl;
     let historyBtnStyle = 'info-round-btn' + (this.props.hide ? ' hide' : '');
     let history = '/history/' + this.props.app.bundleId;
 
@@ -30,7 +52,9 @@ class AppBox extends Component {
           <QRCode value={qrcode} size={100} level='L'/>
 
           {/* App Name */}
-          <div className="info-name">{this.props.app.appName}</div>
+          <div>
+            <span className="info-name">{this.props.app.appName}</span>
+          </div>
 
           {/* Bundle or Package */}
           <div className="info-table-row">
@@ -47,11 +71,11 @@ class AppBox extends Component {
           {/* TimeStamp */}
           <div className="info-table-row">
             <div className="info-table-cell">更新时间</div>
-            <div className="info-table-cell">{new Date(this.props.app.createTimeStamp).toLocaleString()}</div>
+            <div className="info-table-cell">{this.dateFormat(new Date(this.props.app.createTimeStamp))}</div>
           </div>
 
           <div>
-            <a className="info-round-btn" href={this.props.app.fileUrl}>下载当前版本</a>
+            <a className="info-round-btn" href={qrcode}>下载当前版本</a>
             <Link className={historyBtnStyle} style={{marginLeft: '1rem'}} to={history}>查看历史版本</Link>
           </div>
         </div>

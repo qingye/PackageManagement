@@ -6,6 +6,7 @@ import Login from '../components/business/login/Login';
 import Dashboard from '../components/business/Dashboard';
 import Content from '../components/business/content/Content';
 import History from '../components/business/content/History';
+import Page from '../components/business/content/Page';
 
 export const routers = {
   path: '/',
@@ -32,6 +33,11 @@ export const routers = {
           component: History
         }
       ]
+    }
+
+    ,{
+      path: 'page(/:info)',
+      component: Page
     }
   ]
 };

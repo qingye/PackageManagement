@@ -20,6 +20,10 @@ a {
   display: none;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .edge-zero {
   top: 0;
   left: 0;
@@ -183,6 +187,11 @@ a {
       margin-right: 1rem;
     }
 
+    .info-icon-big {
+      width: 9.3rem;
+      height: 9.3rem;
+    }
+
     .info-name {
       color: crimson;
       font-size: 1.5rem;
@@ -245,6 +254,22 @@ a {
       font-size: 1.5rem;
       @extend .absolute-middle-css;
       @include font-with-same-lineHeight(10rem);
+    }
+  }
+}
+
+.page {
+  @extend .absolute-middle-css;
+  text-align: center;
+  vertical-align: middle;
+
+  @at-root {
+    .icon-font-size {
+      font-size: 2rem !important;
+    }
+
+    .info-round-btn-padding {
+      padding: .5rem 4rem;
     }
   }
 }
