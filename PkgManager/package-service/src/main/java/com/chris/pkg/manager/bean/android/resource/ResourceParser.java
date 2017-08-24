@@ -28,21 +28,25 @@ public class ResourceParser {
     private ResChunkTable table = null;
     private ResTablePackage curPkg = null;
     private int specId = 0;
+    private StringBuilder sb = null;
 
     public ResourceParser(File manifest) {
         try {
-            this.reader = new Reader(new FileInputStream(manifest), false);
+            reader = new Reader(new FileInputStream(manifest), false);
+            sb = new StringBuilder();
             parseResTable();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.reader = null;
+//        FileUtil.write("a.txt", sb.toString().getBytes());
+        reader = null;
+        sb = null;
     }
 
     public String valueByResId(String resId) {
-        for (int i = 0; i < this.table.getPkg().length; i++) {
-            this.curPkg = this.table.getPkg()[i];
-            List<Object> list = this.curPkg.getResTypes();
+        for (int i = 0; i < table.getPkg().length; i++) {
+            curPkg = table.getPkg()[i];
+            List<Object> list = curPkg.getResTypes();
             if ((list != null) && (list.size() > 0)) {
                 for (int j = 0; j < list.size(); j++) {
                     Object object = list.get(j);
@@ -54,13 +58,14 @@ public class ResourceParser {
                                 String rid = String.format("@%08X", getResId(k));
                                 if (rid.equals(resId)) {
                                     ResValue value = (ResValue) type.getTypeEntries().get(listIndex);
-                                    return value.getTypeData(this.table.getStringPool().getStringPool());
+                                    return value.getTypeData(table.getStringPool().getStringPool());
                                 }
                                 listIndex++;
                             }
                         }
                     } else {
-                        this.specId = ((ResTableTypeSpec) object).getId();
+                        specId = ((ResTableTypeSpec) object).getId();
+                        System.out.println("pkg.id = " + curPkg.getId() + ", specId = " + specId);
                     }
                 }
             }
@@ -69,16 +74,16 @@ public class ResourceParser {
     }
 
     private void parseResTable() {
-        this.table = new ResChunkTable();
+        table = new ResChunkTable();
         parseResTableHeader();
         parseResPkg();
     }
 
     private ResChunkHeader getResChunkHeader() {
         ResChunkHeader header = new ResChunkHeader();
-        header.setType((short) this.reader.readShort());
-        header.setHeaderSize((short) this.reader.readShort());
-        header.setSize(this.reader.readInt());
+        header.setType((short) reader.readShort());
+        header.setHeaderSize((short) reader.readShort());
+        header.setSize(reader.readInt());
         return header;
     }
 
@@ -92,71 +97,73 @@ public class ResourceParser {
     private void parseResTableHeader() {
         ResTableHeader header = new ResTableHeader();
         header.setHeader(getResChunkHeader());
-        header.setPackageCount(this.reader.readInt());
-        this.table.setHeader(header);
-        this.table.setStringPool(parseResStringPool());
+        header.setPackageCount(reader.readInt());
+        table.setHeader(header);
+        table.setStringPool(parseResStringPool());
     }
 
     private ResStringPoolHeader parseResStringPool() {
         ResStringPoolHeader pool = new ResStringPoolHeader();
         pool.setHeader(getResChunkHeader());
-        pool.setStringCount(this.reader.readInt());
-        pool.setStyleCount(this.reader.readInt());
-        pool.setFlags(this.reader.readInt());
-        pool.setStringsStart(this.reader.readInt());
-        pool.setStylesStart(this.reader.readInt());
-        pool.setStringOffsets(this.reader.readIntArray(pool.getStringCount()));
-        pool.setStyleOffsets(this.reader.readIntArray(pool.getStyleCount()));
+        pool.setStringCount(reader.readInt());
+        pool.setStyleCount(reader.readInt());
+        pool.setFlags(reader.readInt());
+        pool.setStringsStart(reader.readInt());
+        pool.setStylesStart(reader.readInt());
+        pool.setStringOffsets(reader.readIntArray(pool.getStringCount()));
+        pool.setStyleOffsets(reader.readIntArray(pool.getStyleCount()));
 
         int size = (pool.getStyleCount() == 0 ? pool.getHeader().getSize() : pool.getStylesStart()) - pool.getStringsStart();
-        pool.setStringPool(this.reader.readUtf8StringArray(getOffsets(pool.getStringOffsets(), size)));
+        pool.setStringPool(reader.readUtf8StringArray(getOffsets(pool.getStringOffsets(), size)));
         if (pool.getStyleCount() > 0) {
             size = pool.getHeader().getSize() - pool.getStylesStart();
-            pool.setStylePool(this.reader.readUtf8StringArray(getOffsets(pool.getStyleOffsets(), size)));
+            pool.setStylePool(reader.readUtf8StringArray(getOffsets(pool.getStyleOffsets(), size)));
         }
         return pool;
     }
 
     private void parseResPkg() {
-        ResTablePackage[] pkgs = new ResTablePackage[this.table.getHeader().getPackageCount()];
+        ResTablePackage[] pkgs = new ResTablePackage[table.getHeader().getPackageCount()];
         for (int i = 0; i < pkgs.length; i++) {
             pkgs[i] = new ResTablePackage();
             pkgs[i].setHeader(getResChunkHeader());
-            pkgs[i].setId(this.reader.readInt());
-            pkgs[i].setName(this.reader.readCharArray(pkgs[i].getName().length));
-            pkgs[i].setTypeStrings(this.reader.readInt());
-            pkgs[i].setLastPublicType(this.reader.readInt());
-            pkgs[i].setKeyStrings(this.reader.readInt());
-            pkgs[i].setLastPublicKey(this.reader.readInt());
-            pkgs[i].setSkip(this.reader.readInt());
+            pkgs[i].setId(reader.readInt());
+            pkgs[i].setName(reader.readCharArray(pkgs[i].getName().length));
+            pkgs[i].setTypeStrings(reader.readInt());
+            pkgs[i].setLastPublicType(reader.readInt());
+            pkgs[i].setKeyStrings(reader.readInt());
+            pkgs[i].setLastPublicKey(reader.readInt());
+            pkgs[i].setSkip(reader.readInt());
             pkgs[i].setTypeStringPool(parseResStringPool());
             pkgs[i].setKeyStringPool(parseResStringPool());
 
-            this.curPkg = pkgs[i];
+            curPkg = pkgs[i];
             pkgs[i].setResTypes(parseResType());
         }
-        this.table.setPkg(pkgs);
+        table.setPkg(pkgs);
     }
 
     private int getResId(int entryId) {
-        return this.curPkg.getId() << 24 | (this.specId & 0xFF) << 16 | entryId & 0xFFFF;
+        return curPkg.getId() << 24 | (specId & 0xFF) << 16 | entryId & 0xFFFF;
     }
 
     private String getPkgTypeString(int index) {
-        return this.curPkg.getTypeStringPool().getStringPool()[index];
+        return curPkg.getTypeStringPool().getStringPool()[index];
     }
 
     private String getPkgKeyString(int index) {
-        return this.curPkg.getKeyStringPool().getStringPool()[index];
+        return curPkg.getKeyStringPool().getStringPool()[index];
     }
 
     private List<Object> parseResType() {
         List<Object> resTypeList = new ArrayList<>();
-        for (; ; ) {
+        while (true) {
             ResChunkHeader header = getResChunkHeader();
             if (header.getSize() == -1) {
                 break;
             }
+            sb.append("[parseResType] ========> resType = ").append(header.getType()).append("\n");
+
             if (header.getType() == CHUNK_TYPE_SPEC) {
                 resTypeList.add(parseResTypeSpec(header));
             } else if (header.getType() == CHUNK_TYPE) {
@@ -169,32 +176,46 @@ public class ResourceParser {
     private ResTableTypeSpec parseResTypeSpec(ResChunkHeader header) {
         ResTableTypeSpec spec = new ResTableTypeSpec();
         spec.setHeader(header);
-        spec.setId((byte) this.reader.readByte());
+        spec.setId((byte) reader.readByte());
         this.specId = spec.getId();
+        sb.append("[parseResTypeSpec] specId = ").append(specId).append("\n");
 
-        spec.setRes0((byte) this.reader.readByte());
-        spec.setRes1((short) this.reader.readShort());
-        spec.setEntryCount(this.reader.readInt());
-        spec.setEntries(this.reader.readIntArray(spec.getEntryCount()));
+        spec.setRes0((byte) reader.readByte());
+        spec.setRes1((short) reader.readShort());
+        spec.setEntryCount(reader.readInt());
+        spec.setEntries(reader.readIntArray(spec.getEntryCount()));
         return spec;
     }
 
     private ResTableType parseResTypeInfo(ResChunkHeader header) {
+        reader.mark();
+        sb.append("--> parseResTypeInfo.begin.size = ");
+
         ResTableType type = new ResTableType();
         type.setHeader(header);
-        type.setId((byte) this.reader.readByte());
+        type.setId((byte) reader.readByte());
+        sb.append(type.getHeader().getSize()).append("\n");
 
-        type.setRes0((byte) this.reader.readByte());
-        type.setRes1((short) this.reader.readShort());
-        type.setEntryCount(this.reader.readInt());
-        type.setEntriesStart(this.reader.readInt());
+        type.setRes0((byte) reader.readByte());
+        type.setRes1((short) reader.readShort());
+        type.setEntryCount(reader.readInt());
+        type.setEntriesStart(reader.readInt());
         type.setConfig(parseResTableConfig());
-        type.setEntries(this.reader.readIntArray(type.getEntryCount()));
+        type.setEntries(reader.readIntArray(type.getEntryCount()));
 
         List<Object> types = new ArrayList<>();
         for (int i = 0; i < type.getEntryCount(); i++) {
             if (type.getEntries()[i] != -1) {
+
+                sb.append("[").append(i).append("]");
                 ResTableEntry entry = parseResTableEntry();
+
+                if (entry.getFlags() == 1) {
+                    sb.append("---------------------- ResTableMapEntry").append("\n");
+                } else {
+                    sb.append("---------------------- ResValue").append("\n");
+                }
+
                 if (entry.getFlags() == 1) {
                     ResTableMapEntry mapEntry = parseResTableMapEntry(entry);
                     List<ResTableMap> list = new ArrayList<>(mapEntry.getCount());
@@ -206,71 +227,80 @@ public class ResourceParser {
                     types.add(parseResValue());
                 }
             }
+            sb.append("}").append("\n");
         }
         type.setTypeEntries(types);
+
+        sb.append("--> end.consume = ").append(reader.totalConsume()).append("\n");
         return type;
     }
 
     private ResTableConfig parseResTableConfig() {
         ResTableConfig config = new ResTableConfig();
-        byte[] byteConfig = this.reader.readByteArray(48);
+        byte[] byteConfig = reader.readByteArray(48);
 
-        config.setSize(this.reader.bytesToInt(byteConfig, 0, 4));
+        config.setSize(reader.bytesToInt(byteConfig, 0, 4));
 
-        config.setMcc((short) this.reader.bytesToInt(byteConfig, 4, 2));
-        config.setMcc((short) this.reader.bytesToInt(byteConfig, 6, 2));
-        config.setImsi(this.reader.bytesToInt(byteConfig, 4, 4));
+        config.setMcc((short) reader.bytesToInt(byteConfig, 4, 2));
+        config.setMcc((short) reader.bytesToInt(byteConfig, 6, 2));
+        config.setImsi(reader.bytesToInt(byteConfig, 4, 4));
 
-        config.setLanguage(this.reader.getBytes(byteConfig, 8, 2));
-        config.setCountry(this.reader.getBytes(byteConfig, 10, 2));
-        config.setLocale(this.reader.bytesToInt(byteConfig, 8, 4));
+        config.setLanguage(reader.getBytes(byteConfig, 8, 2));
+        config.setCountry(reader.getBytes(byteConfig, 10, 2));
+        config.setLocale(reader.bytesToInt(byteConfig, 8, 4));
 
-        config.setOrientation((byte) this.reader.bytesToInt(byteConfig, 12, 1));
-        config.setTouchscreen((byte) this.reader.bytesToInt(byteConfig, 13, 1));
-        config.setDensity((short) this.reader.bytesToInt(byteConfig, 14, 2));
-        config.setScreenType(this.reader.bytesToInt(byteConfig, 12, 4));
+        config.setOrientation((byte) reader.bytesToInt(byteConfig, 12, 1));
+        config.setTouchscreen((byte) reader.bytesToInt(byteConfig, 13, 1));
+        config.setDensity((short) reader.bytesToInt(byteConfig, 14, 2));
+        config.setScreenType(reader.bytesToInt(byteConfig, 12, 4));
 
-        config.setKeyboard((byte) this.reader.bytesToInt(byteConfig, 16, 1));
-        config.setNavigation((byte) this.reader.bytesToInt(byteConfig, 17, 1));
-        config.setInputFlags((byte) this.reader.bytesToInt(byteConfig, 18, 1));
-        config.setInputPad0((byte) this.reader.bytesToInt(byteConfig, 19, 1));
-        config.setInput(this.reader.bytesToInt(byteConfig, 16, 4));
+        config.setKeyboard((byte) reader.bytesToInt(byteConfig, 16, 1));
+        config.setNavigation((byte) reader.bytesToInt(byteConfig, 17, 1));
+        config.setInputFlags((byte) reader.bytesToInt(byteConfig, 18, 1));
+        config.setInputPad0((byte) reader.bytesToInt(byteConfig, 19, 1));
+        config.setInput(reader.bytesToInt(byteConfig, 16, 4));
 
-        config.setScreenWidth((short) this.reader.bytesToInt(byteConfig, 20, 2));
-        config.setScreenHeight((short) this.reader.bytesToInt(byteConfig, 22, 2));
-        config.setScreenSize(this.reader.bytesToInt(byteConfig, 20, 4));
+        config.setScreenWidth((short) reader.bytesToInt(byteConfig, 20, 2));
+        config.setScreenHeight((short) reader.bytesToInt(byteConfig, 22, 2));
+        config.setScreenSize(reader.bytesToInt(byteConfig, 20, 4));
 
-        config.setSdkVersion((short) this.reader.bytesToInt(byteConfig, 24, 2));
-        config.setMinorVersion((short) this.reader.bytesToInt(byteConfig, 26, 2));
-        config.setVersion(this.reader.bytesToInt(byteConfig, 24, 4));
+        config.setSdkVersion((short) reader.bytesToInt(byteConfig, 24, 2));
+        config.setMinorVersion((short) reader.bytesToInt(byteConfig, 26, 2));
+        config.setVersion(reader.bytesToInt(byteConfig, 24, 4));
 
-        config.setScreenLayout((byte) this.reader.bytesToInt(byteConfig, 28, 1));
-        config.setUiMode((byte) this.reader.bytesToInt(byteConfig, 29, 1));
-        config.setSmallestScreenWidthDp((short) this.reader.bytesToInt(byteConfig, 30, 2));
-        config.setScreenConfig(this.reader.bytesToInt(byteConfig, 28, 4));
+        config.setScreenLayout((byte) reader.bytesToInt(byteConfig, 28, 1));
+        config.setUiMode((byte) reader.bytesToInt(byteConfig, 29, 1));
+        config.setSmallestScreenWidthDp((short) reader.bytesToInt(byteConfig, 30, 2));
+        config.setScreenConfig(reader.bytesToInt(byteConfig, 28, 4));
 
-        config.setScreenWidthDp((short) this.reader.bytesToInt(byteConfig, 32, 2));
-        config.setScreenHeightDp((short) this.reader.bytesToInt(byteConfig, 34, 2));
-        config.setScreenSizeDp(this.reader.bytesToInt(byteConfig, 32, 4));
+        config.setScreenWidthDp((short) reader.bytesToInt(byteConfig, 32, 2));
+        config.setScreenHeightDp((short) reader.bytesToInt(byteConfig, 34, 2));
+        config.setScreenSizeDp(reader.bytesToInt(byteConfig, 32, 4));
 
-        config.setLocaleScript(this.reader.getBytes(byteConfig, 36, 4));
+        config.setLocaleScript(reader.getBytes(byteConfig, 36, 4));
 
-        config.setLocaleVariant(this.reader.getBytes(byteConfig, 40, 8));
+        config.setLocaleVariant(reader.getBytes(byteConfig, 40, 8));
 
+        // 这里，真实的大小可能会大于48个字节，因此需要消耗掉
+        reader.readByteArray(config.getSize() - 48);
         return config;
     }
 
     private ResTableEntry parseResTableEntry() {
+        sb.append("======== [parseResTableEntry] ========\n{").append("\n");
         ResTableEntry entry = new ResTableEntry();
-        entry.setSize((short) this.reader.readShort());
-        entry.setFlags((short) this.reader.readShort());
+        entry.setSize((short) reader.readShort());
+        entry.setFlags((short) reader.readShort());
+        sb.append(short2hex(entry.getSize())).append(" ").append(short2hex(entry.getFlags())).append(" ");
+
         entry.setRef(parseResStringPoolRef());
         return entry;
     }
 
     private ResStringPoolRef parseResStringPoolRef() {
         ResStringPoolRef ref = new ResStringPoolRef();
-        ref.setIndex(this.reader.readInt());
+        ref.setIndex(reader.readInt());
+        sb.append(int2hex(ref.getIndex())).append(" [index = ").append(ref.getIndex()).append("]").append("\n");
         return ref;
     }
 
@@ -281,10 +311,11 @@ public class ResourceParser {
         entry.setRef(resTableEntry.getRef());
 
         ResTableRef parent = new ResTableRef();
-        parent.setIdent(this.reader.readInt());
+        parent.setIdent(reader.readInt());
         entry.setParent(parent);
-        entry.setCount(this.reader.readInt());
+        entry.setCount(reader.readInt());
 
+        sb.append(int2hex(parent.getIdent())).append(" ").append(int2hex(entry.getCount())).append(" [count = ").append(entry.getCount()).append("]").append("\n");
         return entry;
     }
 
@@ -297,17 +328,32 @@ public class ResourceParser {
 
     private ResTableRef parseResTableRef() {
         ResTableRef ref = new ResTableRef();
-        ref.setIdent(this.reader.readInt());
+        ref.setIdent(reader.readInt());
+
+        sb.append(int2hex(ref.getIdent())).append(" ");
         return ref;
     }
 
     private ResValue parseResValue() {
         ResValue value = new ResValue();
-        value.setSize((short) this.reader.readShort());
-        value.setRes0((byte) this.reader.readByte());
-        value.setDataType((byte) this.reader.readByte());
-        value.setData(this.reader.readInt());
+        value.setSize((short) reader.readShort());
+        value.setRes0((byte) reader.readByte());
+        value.setDataType((byte) reader.readByte());
+        value.setData(reader.readInt());
 
+        sb.append(short2hex(value.getSize())).append(" ").append(byte2hex(value.getRes0())).append(byte2hex(value.getDataType())).append(" ").append(int2hex(value.getData())).append("\n");
         return value;
+    }
+
+    private String byte2hex(byte b) {
+        return String.format("%02X", b);
+    }
+
+    private String short2hex(short s) {
+        return byte2hex((byte) s) + byte2hex((byte) (s >> 8));
+    }
+
+    private String int2hex(int i) {
+        return short2hex((short) i) + " " + short2hex((short) (i >> 16));
     }
 }
