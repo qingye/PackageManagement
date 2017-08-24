@@ -17,6 +17,7 @@ class Upload extends Component {
     this.handleDrop = this.handleDrop.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
     this.state = {
+      forbidden: false,
       dragStatus: false,
       display: 'none',
       timeSlot: 0
@@ -63,6 +64,7 @@ class Upload extends Component {
 
     xhr.upload.onload = e => {
       this.refs.progress.innerHTML = '';
+      this.state.forbidden = false;
       this.startTimer();
     };
     xhr.send(formData);
@@ -75,22 +77,31 @@ class Upload extends Component {
   }
 
   handleDragOver(e) {
-    this.dragStatusChange(true);
     e.stopPropagation();
     e.preventDefault();
+
+    if (this.state.forbidden) {
+      return;
+    }
+    this.dragStatusChange(true);
   }
 
   handleDrop(e) {
-    this.uploadFiles(e.dataTransfer.files[0]);
-    this.dragStatusChange(false);
     e.stopPropagation();
     e.preventDefault();
+
+    if (this.state.forbidden) {
+      return;
+    }
+    this.state.forbidden = true;
+    this.uploadFiles(e.dataTransfer.files[0]);
+    this.dragStatusChange(false);
   }
 
   handleDragEnd(e) {
-    this.dragStatusChange(false);
     e.stopPropagation();
     e.preventDefault();
+    this.dragStatusChange(false);
   }
 
   render() {
