@@ -53,7 +53,7 @@ public class MainService {
                 String bundleId = info.get("bundleId");
                 entity.setBundleId(bundleId);
                 String identifier = bundleId.replace("hoc", "").replace("dev", "").replace("pl", "").replace("qa", "");
-                if (identifier.endsWith(".")) {
+                while (identifier.endsWith(".")) {
                     identifier = identifier.substring(0, identifier.length() - 1);
                 }
                 entity.setAppIdentifier(identifier);
