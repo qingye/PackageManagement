@@ -14,8 +14,12 @@
     <context:component-scan base-package="com.chris.pkg.manager.service"/>
 
     <bean id="propertyPlaceHolder" class="com.chris.pkg.manager.system.PropertyPlaceHolder">
-        <property name="location">
-            <value>classpath:META-INF/html/config.properties</value>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:META-INF/database/mysql.properties</value>
+                <value>classpath:META-INF/html/config.properties</value>
+            </list>
         </property>
     </bean>
 
