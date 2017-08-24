@@ -81,6 +81,7 @@
             AND app_identifier = #{appIdentifier}
         </where>
         GROUP BY
+          type,
           bundle_id
         ORDER BY
           type ASC,
