@@ -45,7 +45,7 @@ public class Reader {
     }
 
     public byte[] readByteArray(int length) {
-        return readByte(length);
+        return length > 0 ? readByte(length) : null;
     }
 
     public char[] readCharArray(int length) {

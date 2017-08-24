@@ -32,35 +32,129 @@ public class ResTableConfig implements Serializable {
     public static final int LAYOUTDIR_ANY = 0;
     public static final int LAYOUTDIR_LTR = 1;
     public static final int LAYOUTDIR_RTL = 2;
+
     private int size = 0;
+
+    //运营商信息
+    /*
+    union {
+        struct {
+            // Mobile country code (from SIM).  0 means "any".
+            uint16_t mcc;
+            // Mobile network code (from SIM).  0 means "any".
+            uint16_t mnc;
+        };
+        uint32_t imsi;
+    };*/
     private short mcc = 0;
     private short mnc = 0;
     private int imsi = 0;
+
+    //本地化
+    /*union {
+        struct {
+            char language[2];
+            char country[2];
+        };
+        uint32_t locale;
+    };*/
     private byte[] language = new byte[2];
     private byte[] country = new byte[2];
     private int locale = 0;
+
+    /**
+     * union {
+         struct {
+             uint8_t orientation;
+             uint8_t touchscreen;
+             uint16_t density;
+         };
+         uint32_t screenType;
+     };
+     */
     private byte orientation = 0;
     private byte touchscreen = 0;
     private short density = 0;
     private int screenType = 0;
+
+    //输入属性
+    /**
+     * union {
+         struct {
+             uint8_t keyboard;
+             uint8_t navigation;
+             uint8_t inputFlags;
+             uint8_t inputPad0;
+         };
+         uint32_t input;
+     };
+     */
     private byte keyboard = 0;
     private byte navigation = 0;
     private byte inputFlags = 0;
     private byte inputPad0 = 0;
     private int input = 0;
+
+    //屏幕尺寸
+    /**
+     * union {
+         struct {
+             uint16_t screenWidth;
+             uint16_t screenHeight;
+         };
+         uint32_t screenSize;
+     };
+     */
     private short screenWidth = 0;
     private short screenHeight = 0;
     private int screenSize = 0;
+
+    //系统版本
+    /**
+     * union {
+         struct {
+             uint16_t sdkVersion;
+             // For now minorVersion must always be 0!!!  Its meaning
+             // is currently undefined.
+             uint16_t minorVersion;
+         };
+         uint32_t version;
+     };
+     */
     private short sdkVersion = 0;
     private short minorVersion = 0;
     private int version = 0;
+
+    //屏幕配置
+    /**
+     * union {
+         struct {
+             uint8_t screenLayout;
+             uint8_t uiMode;
+             uint16_t smallestScreenWidthDp;
+         };
+         uint32_t screenConfig;
+     };
+     */
     private byte screenLayout = 0;
     private byte uiMode = 0;
     private short smallestScreenWidthDp = 0;
     private int screenConfig = 0;
+
+    //屏幕尺寸
+    /**
+     * union {
+         struct {
+             uint16_t screenWidthDp;
+             uint16_t screenHeightDp;
+         };
+         uint32_t screenSizeDp;
+     };
+     */
     private short screenWidthDp = 0;
     private short screenHeightDp = 0;
     private int screenSizeDp = 0;
+
     private byte[] localeScript = new byte[4];
     private byte[] localeVariant = new byte[8];
 
