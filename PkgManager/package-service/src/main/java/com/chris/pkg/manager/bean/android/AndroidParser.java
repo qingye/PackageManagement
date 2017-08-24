@@ -22,7 +22,7 @@ public class AndroidParser {
         }
         File arsc = new File(path + "/" + "resources.arsc");
         if (arsc.exists()) {
-            String appName = new ResourceParser(arsc).valueByResId((String) this.info.get("appName"));
+            String appName = new ResourceParser(arsc).valueByResId(this.info.get("appName"));
             this.info.put("appName", appName);
             arsc.delete();
         }

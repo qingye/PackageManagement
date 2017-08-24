@@ -28,7 +28,7 @@ public class MainController {
     private static final String DEFAULT_CHARSET = "UTF-8";
     @Autowired
     private ApplicationContext context;
-    private static Map<String, Class<?>> maps = new HashMap();
+    private static Map<String, Class<?>> maps = new HashMap<>();
 
     static {
         maps.put("MainService/fileUpload", MainService.class);

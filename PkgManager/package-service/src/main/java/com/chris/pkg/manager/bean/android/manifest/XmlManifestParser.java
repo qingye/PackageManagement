@@ -84,7 +84,7 @@ public class XmlManifestParser {
     }
 
     private List<XmlContentChunk> parseXmlContentChunk() {
-        List<XmlContentChunk> xmlContentChunks = new ArrayList();
+        List<XmlContentChunk> xmlContentChunks = new ArrayList<>();
         for (; ; ) {
             int chunkType = this.reader.readInt();
             if (chunkType == -1) {
@@ -92,20 +92,20 @@ public class XmlManifestParser {
             }
             XmlContentChunk chunk = null;
             switch (chunkType) {
-                case 1048832:
-                case 1048833:
+                case 0x00100100:  // StartNameSpace
+                case 0x00100101:  // EndNameSpace
                     chunk = new NameSpaceChunk();
                     parseXmlNamespaceChunk((NameSpaceChunk) chunk);
                     break;
-                case 1048834:
+                case 0x00100102:  // StartTag
                     chunk = new StartTagChunk();
                     parseXmlTagChunk((StartTagChunk) chunk);
                     break;
-                case 1048835:
+                case 0x00100103:  // EndTag
                     chunk = new EndTagChunk();
                     parseXmlTagChunk((TagChunk) chunk);
                     break;
-                case 1048836:
+                case 0x00100104:  // Text
                 default:
                     chunk = new TextChunk();
                     parseXmlTextChunk((TextChunk) chunk);

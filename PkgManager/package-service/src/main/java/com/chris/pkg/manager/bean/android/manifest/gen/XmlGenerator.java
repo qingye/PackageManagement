@@ -22,7 +22,7 @@ public class XmlGenerator {
     private String[] arrayString = null;
     private Map<String, String> nameSpaceMap = null;
     private StringBuffer gap = new StringBuffer();
-    private Map<String, String> info = new HashMap();
+    private Map<String, String> info = new HashMap<>();
 
     public XmlGenerator(ChunkHeader header) {
         this.arrayString = header.getStringChunk().getStringPool();
@@ -33,7 +33,7 @@ public class XmlGenerator {
 
     private void genXmlContent(List<XmlContentChunk> xmlContentChunks) {
         if (this.nameSpaceMap == null) {
-            this.nameSpaceMap = new HashMap();
+            this.nameSpaceMap = new HashMap<>();
         } else {
             this.nameSpaceMap.clear();
         }

@@ -49,7 +49,7 @@ public class FileUtil {
         if (plist.exists()) {
             try {
                 NSDictionary dict = (NSDictionary) PropertyListParser.parse(plist);
-                info = new HashMap();
+                info = new HashMap<>();
                 if (dict.objectForKey("CFBundleDisplayName") != null) {
                     info.put("appName", dict.objectForKey("CFBundleDisplayName").toString());
                 } else {
