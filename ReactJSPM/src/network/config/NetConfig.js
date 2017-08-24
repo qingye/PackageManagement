@@ -9,7 +9,7 @@ const BaseDistUrl = 'https://appmgr.vd.cn/';
 export default BaseUrl => {
     let url = BaseDistUrl;
     if (config.appEnv === 'dev') {
-        url = BaseDistUrl;//BaseDevUrl;
+        url = BaseDevUrl;
     }
     return url;
 }

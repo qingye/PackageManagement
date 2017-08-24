@@ -21,17 +21,20 @@ class MenuList extends Component {
 
   refreshMenus() {
     let path = hashHistory.getCurrentLocation().pathname;
+    path = path.substring(path.lastIndexOf('/') + 1);
+
     let menuList = [];
     let menus = this.props.menuList;
     if (menus && menus.length > 0) {
       menus.forEach((menu, index) => {
-        if (path.indexOf(menu.appIdentifier) > -1) {
+        if (path === menu.appIdentifier) {
           this.state.selected = index;
         }
 
+        let menuName = menu.appName.replace(/[a-zA-Z0-9_]*/g, '');
         menuList.push(
           <Menu key={index}
-                name={menu.appName}
+                name={menuName}
                 appIdentifier={menu.appIdentifier}
                 selected={this.state.selected === index}
                 select={this.select(index)}/>
