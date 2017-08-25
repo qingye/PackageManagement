@@ -12,7 +12,7 @@ let BowerWebpackPlugin = require('bower-webpack-plugin');
 
 let config = Object.assign({}, baseConfig, {
   entry: {
-    bundle: path.join(__dirname, '../src/index'),
+    app: path.join(__dirname, '../src/index'),
     vendor: ['react', 'react-dom', 'react-router']
   },
   cache: false,
@@ -38,9 +38,9 @@ let config = Object.assign({}, baseConfig, {
       title: 'APP包管理',
       filename: '../index.html',
       template: 'src/index.html',
-      inject: 'head',
+      inject: 'body',
       showErrors: true,
-      chunks: ['vendor']
+      chunks: ['vendor', 'app']
     })
   ],
   module: defaultSettings.getDefaultModules()
